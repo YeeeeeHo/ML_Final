@@ -29,12 +29,13 @@
   - 주변 데이터의 다수결 원칙으로 분류.
   - 거리 기반으로 가장 가까운 `k`개의 데이터 참고.
 
+---
 [Hyperparameter Optimization](./Hyperparameter_Optimization.ipynb)
 
 [Visualization](./combined_visualization_code.ipynb)
 
 [Data Preprocessing](./Data_Preprocessing.ipynb)
-
+---
 [Summary](./summary.md)
 
 [Classification](./5.lecture_classification.ipynb)
