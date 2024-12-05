@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # CSV 파일을 로드
-file_path = 'C:\\VSCODE\\hw.csv'
+file_path = 'hw.csv'
 data = pd.read_csv(file_path)
 
 # 데이터 행렬
