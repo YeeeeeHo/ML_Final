@@ -1,6 +1,6 @@
 # ML_lecture
 
-# 분류 모델(지도 학습)
+# [분류모델 (지도 학습)](./example/classification/classification.ipynb)
 ## 1. 나이브 베이즈 (Naive Bayes)
 - 텍스트 분류: 스팸 이메일 분류, 감성 분석 등.
 - 빠른 예측이 필요한 경우: 계산이 간단하여 대규모 데이터에서도 효율적.
