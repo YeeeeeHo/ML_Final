@@ -1,3 +1,5 @@
+# 모든 코드에 있는 라이브러리
+
 import numpy as np
 
 import matplotlib.pyplot as plt
