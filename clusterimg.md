@@ -314,3 +314,177 @@ plt.show()
 	•	예: 데이터셋에 따라 feature1, feature2 등의 이름을 실제 열 이름으로 바꿔야 함.
 	3.	의미 있는 열 선택:
 	•	PCA와 군집화를 적용할 데이터는 의미 있는 수치형 열만 포함해야 함. 범주형 열은 제거하거나 인코딩.
+
+DBSCAN (Density-Based Spatial Clustering of Applications with Noise)
+
+DBSCAN은 밀도 기반 군집화 알고리즘으로, 데이터 포인트를 **밀도가 높은 영역(Cluster)**과 **노이즈(Noise)**로 구분합니다.
+
+1. DBSCAN의 특징
+
+	1.	군집의 모양:
+	•	비구조적인 클러스터를 탐지(원형이 아닌 모양 가능).
+	•	데이터가 불균형하거나 클러스터 크기가 다양한 경우에도 적합.
+	2.	하이퍼파라미터:
+	•	eps: 두 데이터 포인트가 같은 클러스터로 간주되는 최대 거리.
+	•	min_samples: 한 클러스터의 최소 데이터 포인트 수(밀도의 기준).
+	3.	노이즈 처리:
+	•	밀도가 낮은 점(노이즈)을 클러스터에서 제외.
+	4.	초기 클러스터 개수 설정 불필요:
+	•	K-means와 달리, 초기 클러스터 개수를 지정하지 않아도 됩니다.
+
+2. DBSCAN 알고리즘의 단계
+
+	1.	각 포인트의 **이웃 거리(eps)**를 확인.
+	2.	min_samples 이상의 이웃을 가지는 포인트는 **코어 포인트(Core Point)**로 간주.
+	3.	코어 포인트 주변에 있는 포인트를 하나의 클러스터로 병합.
+	4.	클러스터에 속하지 못하는 포인트는 **노이즈(Noise)**로 간주.
+
+3. DBSCAN 구현
+
+3.1 데이터 로드 및 전처리
+
+import pandas as pd
+from sklearn.preprocessing import StandardScaler
+
+# 데이터 로드
+file_path = 'your_dataset.csv'
+data = pd.read_csv(file_path)
+
+# 수치형 변수만 선택
+numeric_features = data.select_dtypes(include=['int64', 'float64'])
+
+# 스케일링
+scaler = StandardScaler()
+X = scaler.fit_transform(numeric_features)
+
+3.2 DBSCAN 적용
+
+from sklearn.cluster import DBSCAN
+import numpy as np
+
+# DBSCAN 모델 생성
+dbscan = DBSCAN(eps=0.5, min_samples=5)
+
+# 클러스터링 수행
+cluster_labels = dbscan.fit_predict(X)
+
+# 결과 출력
+print(f"Cluster Labels: {np.unique(cluster_labels)}")
+
+3.3 결과 시각화
+
+import matplotlib.pyplot as plt
+
+# 2D 데이터로 변환 (PCA)
+from sklearn.decomposition import PCA
+
+pca = PCA(n_components=2)
+X_pca = pca.fit_transform(X)
+
+# 시각화
+plt.figure(figsize=(8, 6))
+plt.scatter(X_pca[:, 0], X_pca[:, 1], c=cluster_labels, cmap='viridis', alpha=0.7)
+plt.title("DBSCAN Clustering Visualization")
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.colorbar(label='Cluster')
+plt.show()
+
+4. 하이퍼파라미터 튜닝
+
+DBSCAN은 **eps**와 **min_samples**에 매우 민감합니다. 최적의 파라미터를 찾기 위해 다양한 값을 실험하거나, 이웃 거리의 평균을 사용하여 적절한 값을 찾습니다.
+
+4.1 eps 최적화 (k-거리 그래프)
+
+	•	k-거리 그래프는 가장 가까운 k개의 포인트와의 거리를 계산하여 eps 값을 설정하는 데 도움을 줍니다.
+
+from sklearn.neighbors import NearestNeighbors
+import numpy as np
+import matplotlib.pyplot as plt
+
+# k-거리 계산
+k = 5  # min_samples와 동일하게 설정
+neighbors = NearestNeighbors(n_neighbors=k)
+neighbors_fit = neighbors.fit(X)
+distances, indices = neighbors_fit.kneighbors(X)
+
+# 거리 정렬 후 그래프
+distances = np.sort(distances[:, k-1], axis=0)
+plt.figure(figsize=(8, 6))
+plt.plot(distances)
+plt.title("k-distance Graph")
+plt.xlabel("Data Points Sorted by Distance")
+plt.ylabel(f"{k}-distance")
+plt.show()
+
+	•	그래프에서 급격히 증가하는 지점을 찾아 eps로 설정.
+
+4.2 min_samples 최적화
+
+	•	min_samples는 일반적으로 데이터 차원(d)에 따라 설정:
+￼
+
+5. 결과 해석
+
+	•	클러스터 레이블:
+	•	-1: 노이즈(밀도가 낮은 점).
+	•	0, 1, 2, ...: 클러스터 번호.
+
+# 클러스터 결과 확인
+import numpy as np
+unique_clusters = np.unique(cluster_labels)
+print(f"Number of clusters (excluding noise): {len(unique_clusters) - (1 if -1 in unique_clusters else 0)}")
+print(f"Number of noise points: {sum(cluster_labels == -1)}")
+
+6. DBSCAN 시각화 및 변수 수정
+
+	•	데이터 불러오기 및 변수 변경:
+	•	PCA를 적용한 경우, 새로운 데이터셋을 불러왔을 때 X와 cluster_labels를 다시 생성해야 합니다.
+
+# 데이터 로드
+new_data = pd.read_csv('new_dataset.csv')
+
+# 수치형 변수 선택 및 스케일링
+numeric_features = new_data.select_dtypes(include=['float64', 'int64'])
+X_new = scaler.fit_transform(numeric_features)
+
+# DBSCAN 클러스터링
+cluster_labels_new = dbscan.fit_predict(X_new)
+
+# PCA 시각화
+X_pca_new = pca.fit_transform(X_new)
+
+plt.figure(figsize=(8, 6))
+plt.scatter(X_pca_new[:, 0], X_pca_new[:, 1], c=cluster_labels_new, cmap='viridis', alpha=0.7)
+plt.title("DBSCAN Visualization (New Data)")
+plt.xlabel("Principal Component 1")
+plt.ylabel("Principal Component 2")
+plt.colorbar(label='Cluster')
+plt.show()
+
+7. DBSCAN의 장점과 한계
+
+장점
+
+	•	클러스터의 모양이 다양해도 군집화 가능(비구조적 클러스터 탐지).
+	•	군집 개수를 미리 지정할 필요 없음.
+	•	노이즈(이상치) 탐지가 가능.
+
+한계
+
+	•	eps와 min_samples 설정에 민감.
+	•	클러스터 밀도가 크게 다르면 성능 저하.
+	•	데이터 차원이 높을수록 계산 비용 증가.
+
+8. DBSCAN 요약
+
+	1.	전처리:
+	•	수치형 데이터 선택 및 스케일링 필수.
+	2.	모델링:
+	•	DBSCAN의 eps와 min_samples 하이퍼파라미터 설정.
+	3.	결과 시각화:
+	•	PCA를 사용하여 2D로 변환 후 군집화 결과 확인.
+	4.	튜닝:
+	•	k-거리 그래프를 활용하여 최적의 eps 값 탐색.
+
+
