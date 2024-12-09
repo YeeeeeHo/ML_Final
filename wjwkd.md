@@ -130,3 +130,88 @@ output['Predicted'] = output['Predicted'].round(2)
 	•	회귀: 연속적인 값 예측 (Predicted).
 	•	군집화: 각 데이터 포인트의 클러스터 번호 (Cluster).
 	•	이 방식은 대회 제출용 또는 결과 저장 시 매우 일반적이며, 위 코드를 상황에 맞게 수정해 사용할 수 있습니다.
+
+
+네, 다른 데이터는 그대로 유지하고 예측 결과 열만 추가하면 됩니다. 하지만 사용 목적에 따라 약간의 조정이 필요할 수 있습니다. 일반적인 작업 흐름을 기준으로 예를 들어 설명하겠습니다.
+
+1. 분류(Classification)
+
+	•	기존 데이터: 입력 데이터(특성들)는 그대로 유지.
+	•	추가 열: 모델이 예측한 클래스 레이블(Predicted) 열을 추가.
+
+결과
+
+Feature1	Feature2	Predicted
+1	5	0
+2	4	1
+3	3	0
+4	2	1
+
+코드
+
+data['Predicted'] = predictions
+data.to_csv('classification_results_with_features.csv', index=False)
+
+2. 회귀(Regression)
+
+	•	기존 데이터: 입력 데이터(특성들)는 그대로 유지.
+	•	추가 열: 모델이 예측한 연속 값(Predicted) 열을 추가.
+
+결과
+
+Feature1	Feature2	Predicted
+1	5	45.23
+2	4	38.12
+3	3	50.78
+4	2	41.34
+
+코드
+
+data['Predicted'] = predictions
+data.to_csv('regression_results_with_features.csv', index=False)
+
+3. 군집화(Clustering)
+
+	•	기존 데이터: 입력 데이터는 그대로 유지.
+	•	추가 열: 데이터 포인트가 속한 클러스터 번호(Cluster)를 추가.
+
+결과
+
+Feature1	Feature2	Cluster
+1	5	0
+2	4	1
+3	3	0
+4	2	2
+
+코드
+
+data['Cluster'] = cluster_labels
+data.to_csv('clustering_results_with_features.csv', index=False)
+
+4. 예외 상황
+
+	•	일부 경우에는 원본 데이터를 포함하지 않고 예측 결과만 저장해야 할 수도 있습니다.
+예: 데이터 분석 대회에서 제출 요구사항이 Id와 Predicted 열만 포함하도록 명시된 경우.
+
+결과 (간소화된 형식):
+
+Id	Predicted
+1	45.23
+2	38.12
+3	50.78
+4	41.34
+
+코드
+
+output = pd.DataFrame({'Id': data.index, 'Predicted': predictions})
+output.to_csv('submission.csv', index=False)
+
+5. 정리
+
+	•	분류/회귀/군집화 모두 예측 결과를 새로운 열로 추가하면 됩니다.
+	•	원본 데이터는 유지하며, 추가된 결과를 CSV로 저장합니다.
+	•	제출 요구사항이 있다면, 원본 데이터 없이 예측 결과만 저장할 수도 있습니다.
+
+결론
+
+예측 결과를 추가하는 방식은 프로젝트의 요구사항에 따라 조정될 수 있지만, 일반적으로 기존 데이터는 유지하고 예측 열만 추가합니다.
