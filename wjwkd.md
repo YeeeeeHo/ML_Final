@@ -215,3 +215,109 @@ output.to_csv('submission.csv', index=False)
 결론
 
 예측 결과를 추가하는 방식은 프로젝트의 요구사항에 따라 조정될 수 있지만, 일반적으로 기존 데이터는 유지하고 예측 열만 추가합니다.
+
+
+결과를 저장하는 CSV 파일에 무엇을 포함시켜야 하는지는 문제의 요구사항(예: 대회, 과제, 프로젝트)에 따라 달라질 수 있습니다. 하지만 일반적으로 아래와 같은 항목들을 포함해야 합니다.
+
+CSV 파일에 포함되어야 할 내용
+
+1. 분류(Classification)
+
+목적: 데이터의 **클래스 레이블(0, 1, A, B)**을 예측하여 저장.
+
+	•	필수 항목:
+	•	ID 열: 각 데이터 포인트를 고유하게 식별할 수 있는 값(예: Index).
+	•	예측 결과 열: 모델이 예측한 클래스 값(Predicted).
+
+예시
+
+Id	Predicted
+1	0
+2	1
+3	0
+4	1
+
+output = pd.DataFrame({'Id': X_test.index, 'Predicted': predictions})
+output.to_csv('classification_results.csv', index=False)
+
+2. 회귀(Regression)
+
+목적: 데이터의 **연속적인 값(숫자)**을 예측하여 저장.
+
+	•	필수 항목:
+	•	ID 열: 각 데이터 포인트를 고유하게 식별할 수 있는 값.
+	•	예측 결과 열: 모델이 예측한 값(Predicted).
+
+예시
+
+Id	Predicted
+1	45.23
+2	38.12
+3	50.78
+4	41.34
+
+output = pd.DataFrame({'Id': X_test.index, 'Predicted': predictions})
+output.to_csv('regression_results.csv', index=False)
+
+3. 군집화(Clustering)
+
+목적: 각 데이터 포인트의 클러스터 번호를 저장.
+
+	•	필수 항목:
+	•	ID 열: 각 데이터 포인트를 고유하게 식별할 수 있는 값.
+	•	클러스터 열: 각 데이터가 속한 클러스터 번호(Cluster).
+
+예시
+
+Id	Cluster
+1	0
+2	1
+3	0
+4	2
+
+output = pd.DataFrame({'Id': data.index, 'Cluster': cluster_labels})
+output.to_csv('clustering_results.csv', index=False)
+
+결과 파일에 포함하면 안 되는 항목
+
+	1.	원본 데이터:
+	•	예측 결과만 포함하며, 모델에 사용된 특성(Feature1, Feature2 등)은 포함하지 않아야 합니다.
+	2.	불필요한 메타데이터:
+	•	학습 과정에서 사용한 파라미터, 내부 인덱스 등은 제외.
+	3.	중간 데이터:
+	•	예측 확률, 중간 계산 값 등은 요구되지 않으면 포함하지 않습니다.
+
+파일에 포함해야 할 내용이 달라질 경우
+
+	1.	대회 또는 과제의 요구사항 확인:
+	•	제출 형식이 명확히 명시되어 있을 수 있습니다(예: “Id와 Predicted 열만 포함”).
+	2.	문제에 따라 달라질 수 있는 추가 열:
+	•	몇몇 대회는 확률 값이나 추가적인 설명을 요구할 수 있습니다.
+
+추가적으로 주의할 점
+
+	1.	ID 열의 정렬:
+	•	ID가 있는 경우, 제출 전 반드시 정렬.
+
+output.sort_values(by='Id', inplace=True)
+
+
+	2.	소수점 자리수:
+	•	회귀 문제에서 소수점 자리수를 명시적으로 요구할 수 있음.
+
+output['Predicted'] = output['Predicted'].round(2)
+
+
+	3.	CSV 파일 형식:
+	•	파일은 반드시 UTF-8 형식으로 저장.
+
+output.to_csv('submission.csv', index=False, encoding='utf-8')
+
+요약
+
+모델	포함 항목	예시
+분류	ID, Predicted	Id, Predicted
+회귀	ID, Predicted	Id, Predicted
+군집화	ID, Cluster	Id, Cluster
+
+CSV 파일은 예측 결과만 포함해야 하며, 학습에 사용된 원본 데이터는 제거해야 합니다. 파일 형식과 내용 구성이 요구사항에 맞는지 항상 확인하세요!
